@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "lettera-app",
+    "name": "Lettera",
     "slug": "lettera-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,7 +21,15 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
-    ]
+  "expo-font",
+  [
+    "expo-splash-screen",
+    {
+      "image": "./assets/logo.png",
+      "imageWidth": 200,
+      "backgroundColor": "#F6F2E9"
+    }
+  ]
+]
   }
 }
