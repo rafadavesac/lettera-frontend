@@ -33,3 +33,9 @@ export function getFirstName(name) {
   const first = String(name ?? '').trim().split(' ')[0];
   return first || 'leitor(a)';
 }
+
+// Texto da contagem de resultados: 1 -> "1 resultado", 3 -> "3 resultados".
+// Custo: O(1).
+export function formatResultCount(count) {
+  return `${count} ${count === 1 ? 'resultado' : 'resultados'}`;
+}
