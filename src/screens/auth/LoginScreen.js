@@ -14,8 +14,6 @@ import { useAuth } from '../../hooks/useAuth';
 import { isValidEmail } from '../../utils/validators';
 import { theme } from '../../theme';
 
-
-
 export default function LoginScreen({navigation}) {
   const { signIn } = useAuth();
   const passwordRef = useRef(null);
