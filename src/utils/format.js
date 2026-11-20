@@ -26,3 +26,10 @@ export function formatDate(value) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   return `${day}/${month}/${date.getFullYear()}`;
 }
+
+// Primeiro nome: "Maria Silva" -> "Maria". Sem nome, devolve "leitor(a)".
+// Custo: O(n) no tamanho do nome.
+export function getFirstName(name) {
+  const first = String(name ?? '').trim().split(' ')[0];
+  return first || 'leitor(a)';
+}
