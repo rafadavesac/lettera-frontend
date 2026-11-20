@@ -1,20 +1,20 @@
 import { useRef, useState } from 'react';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
-  View,
 } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { isValidEmail } from '../../utils/validators';
 import { theme } from '../../theme';
+import Button from '../../components/Button';
+import TextField from '../../components/TextField';
+import ErrorBanner from '../../components/ErrorBanner';
 
-export default function LoginScreen({navigation}) {
+export default function LoginScreen({ navigation }) {
   const { signIn } = useAuth();
   const passwordRef = useRef(null);
 
@@ -62,16 +62,11 @@ export default function LoginScreen({navigation}) {
         <Text style={styles.title}>Lettera</Text>
         <Text style={styles.subtitle}>Entre na sua conta</Text>
 
-        {error && (
-          <View style={styles.errorBox}>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
+        <ErrorBanner message={error} />
 
-        <TextInput
-          style={styles.input}
-          placeholder="E-mail"
-          placeholderTextColor={theme.colors.textMuted}
+        <TextField
+          label="E-mail"
+          placeholder="voce@email.com"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -80,32 +75,29 @@ export default function LoginScreen({navigation}) {
           returnKeyType="next"
           onSubmitEditing={() => passwordRef.current?.focus()}
           editable={!submitting}
+          style={styles.field}
         />
-        <TextInput
+        <TextField
           ref={passwordRef}
-          style={styles.input}
-          placeholder="Senha"
-          placeholderTextColor={theme.colors.textMuted}
+          label="Senha"
+          placeholder="Sua senha"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           returnKeyType="done"
           onSubmitEditing={handleSubmit}
           editable={!submitting}
+          style={styles.field}
+        />
+
+        <Button
+          title="Entrar"
+          onPress={handleSubmit}
+          loading={submitting}
+          style={styles.submit}
         />
 
         <Pressable
-          style={[styles.button, submitting && styles.buttonDisabled]}
-          onPress={handleSubmit}
-          disabled={submitting}
-        >
-          {submitting ? (
-            <ActivityIndicator color={theme.colors.surface} />
-          ) : (
-            <Text style={styles.buttonText}>Entrar</Text>
-          )}
-        </Pressable>
-                <Pressable
           style={styles.link}
           onPress={() => navigation.navigate('SignUp')}
           disabled={submitting}
@@ -141,47 +133,13 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.sm,
     marginBottom: theme.spacing.xl,
   },
-  errorBox: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.error,
-    borderWidth: 1,
-    borderRadius: theme.radius.field,
-    padding: theme.spacing.md,
+  field: {
     marginBottom: theme.spacing.md,
   },
-  errorText: {
-    fontFamily: theme.fonts.body,
-    fontSize: theme.fontSizes.body,
-    color: theme.colors.error,
-  },
-  input: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
-    borderWidth: 1,
-    borderRadius: theme.radius.field,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-    fontFamily: theme.fonts.body,
-    fontSize: theme.fontSizes.body,
-    color: theme.colors.text,
-  },
-  button: {
-    alignItems: 'center',
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.field,
-    paddingVertical: theme.spacing.md,
+  submit: {
     marginTop: theme.spacing.sm,
   },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    fontFamily: theme.fonts.bodySemiBold,
-    fontSize: theme.fontSizes.body,
-    color: theme.colors.surface,
-  },
-    link: {
+  link: {
     alignItems: 'center',
     marginTop: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,

@@ -15,6 +15,7 @@ export default function TextField({
   onChangeText,
   error,
   style,
+  ref,
   ...inputProps
 }) {
   const [focused, setFocused] = useState(false);
@@ -31,6 +32,7 @@ export default function TextField({
       {label ? <Text style={styles.label}>{label}</Text> : null}
 
       <TextInput
+        ref={ref}
         value={value}
         onChangeText={onChangeText}
         onFocus={() => setFocused(true)}
