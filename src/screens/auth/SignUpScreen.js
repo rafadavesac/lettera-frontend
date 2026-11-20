@@ -1,18 +1,18 @@
 import { useRef, useState } from 'react';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
-  View,
 } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { isValidEmail, isValidPassword, MIN_PASSWORD_LENGTH } from '../../utils/validators';
 import { theme } from '../../theme';
+import Button from '../../components/Button';
+import TextField from '../../components/TextField';
+import ErrorBanner from '../../components/ErrorBanner';
 
 export default function SignUpScreen({ navigation }) {
   const { signUp } = useAuth();
@@ -72,28 +72,23 @@ export default function SignUpScreen({ navigation }) {
         <Text style={styles.title}>Criar conta</Text>
         <Text style={styles.subtitle}>Descubra seu próximo livro</Text>
 
-        {error && (
-          <View style={styles.errorBox}>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
+        <ErrorBanner message={error} />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Nome"
-          placeholderTextColor={theme.colors.textMuted}
+        <TextField
+          label="Nome"
+          placeholder="Seu nome"
           value={name}
           onChangeText={setName}
           autoCapitalize="words"
           returnKeyType="next"
           onSubmitEditing={() => emailRef.current?.focus()}
           editable={!submitting}
+          style={styles.field}
         />
-        <TextInput
+        <TextField
           ref={emailRef}
-          style={styles.input}
-          placeholder="E-mail"
-          placeholderTextColor={theme.colors.textMuted}
+          label="E-mail"
+          placeholder="voce@email.com"
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -102,43 +97,39 @@ export default function SignUpScreen({ navigation }) {
           returnKeyType="next"
           onSubmitEditing={() => passwordRef.current?.focus()}
           editable={!submitting}
+          style={styles.field}
         />
-        <TextInput
+        <TextField
           ref={passwordRef}
-          style={styles.input}
-          placeholder="Senha"
-          placeholderTextColor={theme.colors.textMuted}
+          label="Senha"
+          placeholder="Mínimo de caracteres exigido"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           returnKeyType="next"
           onSubmitEditing={() => confirmRef.current?.focus()}
           editable={!submitting}
+          style={styles.field}
         />
-        <TextInput
+        <TextField
           ref={confirmRef}
-          style={styles.input}
-          placeholder="Confirmar senha"
-          placeholderTextColor={theme.colors.textMuted}
+          label="Confirmar senha"
+          placeholder="Repita a senha"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry
           returnKeyType="done"
           onSubmitEditing={handleSubmit}
           editable={!submitting}
+          style={styles.field}
         />
 
-        <Pressable
-          style={[styles.button, submitting && styles.buttonDisabled]}
+        <Button
+          title="Cadastrar"
           onPress={handleSubmit}
-          disabled={submitting}
-        >
-          {submitting ? (
-            <ActivityIndicator color={theme.colors.surface} />
-          ) : (
-            <Text style={styles.buttonText}>Cadastrar</Text>
-          )}
-        </Pressable>
+          loading={submitting}
+          style={styles.submit}
+        />
 
         <Pressable
           style={styles.link}
@@ -176,45 +167,11 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.sm,
     marginBottom: theme.spacing.xl,
   },
-  errorBox: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.error,
-    borderWidth: 1,
-    borderRadius: theme.radius.field,
-    padding: theme.spacing.md,
+  field: {
     marginBottom: theme.spacing.md,
   },
-  errorText: {
-    fontFamily: theme.fonts.body,
-    fontSize: theme.fontSizes.body,
-    color: theme.colors.error,
-  },
-  input: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
-    borderWidth: 1,
-    borderRadius: theme.radius.field,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-    fontFamily: theme.fonts.body,
-    fontSize: theme.fontSizes.body,
-    color: theme.colors.text,
-  },
-  button: {
-    alignItems: 'center',
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.field,
-    paddingVertical: theme.spacing.md,
+  submit: {
     marginTop: theme.spacing.sm,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    fontFamily: theme.fonts.bodySemiBold,
-    fontSize: theme.fontSizes.body,
-    color: theme.colors.surface,
   },
   link: {
     alignItems: 'center',
