@@ -1,8 +1,8 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { baseTabOptions } from './tabOptions';
-import HomeScreen from '../screens/buyer/HomeScreen';
-import KitsScreen from '../screens/buyer/KitsScreen';
+import HomeStack from './HomeStack';
+import KitsStack from './KitsStack';
 import CartScreen from '../screens/buyer/CartScreen';
 import OrdersScreen from '../screens/buyer/OrdersScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -27,8 +27,8 @@ export default function BuyerTabs() {
         ),
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Início' }} />
-      <Tab.Screen name="Kits" component={KitsScreen} options={{ title: 'Kits' }} />
+      <Tab.Screen name="Home" component={HomeStack} options={{ title: 'Início' }} />
+      <Tab.Screen name="Kits" component={KitsStack} options={{ title: 'Kits' }} />
       <Tab.Screen name="Cart" component={CartScreen} options={{ title: 'Carrinho' }} />
       <Tab.Screen name="Orders" component={OrdersScreen} options={{ title: 'Pedidos' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
