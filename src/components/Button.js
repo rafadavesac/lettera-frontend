@@ -18,6 +18,12 @@ const VARIANTS = {
     text: colors.primary,
     border: colors.primary,
   },
+  danger: {
+    background: colors.error,
+    pressed: colors.errorDark,
+    text: colors.surface,
+    border: colors.error,
+  },
 };
 
 // Custo de renderização: O(1), o componente não percorre listas.

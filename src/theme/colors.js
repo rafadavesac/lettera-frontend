@@ -11,4 +11,5 @@ export const colors = {
   textMuted: '#5B6482',
   success: '#2E7D5B',
   error: '#B3261E',
+  errorDark: '#8E1B15',
 };
