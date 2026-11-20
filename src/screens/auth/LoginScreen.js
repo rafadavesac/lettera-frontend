@@ -14,7 +14,9 @@ import { useAuth } from '../../hooks/useAuth';
 import { isValidEmail } from '../../utils/validators';
 import { theme } from '../../theme';
 
-export default function LoginScreen() {
+
+
+export default function LoginScreen({navigation}) {
   const { signIn } = useAuth();
   const passwordRef = useRef(null);
 
@@ -105,6 +107,13 @@ export default function LoginScreen() {
             <Text style={styles.buttonText}>Entrar</Text>
           )}
         </Pressable>
+                <Pressable
+          style={styles.link}
+          onPress={() => navigation.navigate('SignUp')}
+          disabled={submitting}
+        >
+          <Text style={styles.linkText}>Não tem conta? Cadastre-se</Text>
+        </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -173,5 +182,15 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.bodySemiBold,
     fontSize: theme.fontSizes.body,
     color: theme.colors.surface,
+  },
+    link: {
+    alignItems: 'center',
+    marginTop: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+  },
+  linkText: {
+    fontFamily: theme.fonts.bodySemiBold,
+    fontSize: theme.fontSizes.body,
+    color: theme.colors.primary,
   },
 });

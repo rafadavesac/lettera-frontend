@@ -7,3 +7,9 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function isValidEmail(email) {
   return EMAIL_REGEX.test(email.trim());
 }
+
+export const MIN_PASSWORD_LENGTH = 6;
+
+export function isValidPassword(password) {
+  return password.length >= MIN_PASSWORD_LENGTH;
+}

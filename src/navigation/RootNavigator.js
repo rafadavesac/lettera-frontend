@@ -6,6 +6,7 @@ import { theme } from '../theme';
 import LoginScreen from '../screens/auth/LoginScreen';
 import BuyerTabs from './BuyerTabs';
 import SellerTabs from './SellerTabs';
+import SignUpScreen from '../screens/auth/SignUpScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +27,10 @@ export default function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!user ? (
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
+        </>
       ) : isSeller(user) ? (
         <Stack.Screen name="SellerTabs" component={SellerTabs} />
       ) : (
