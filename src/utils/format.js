@@ -15,3 +15,14 @@ export function formatPrice(value) {
 export function formatBookCount(count) {
   return `${count} ${count === 1 ? 'livro' : 'livros'} surpresa`;
 }
+
+// Formata uma data ISO (ex.: "2026-11-20T14:30:00") como "20/11/2026".
+// Custo: O(1).
+export function formatDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '--/--/----';
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}/${date.getFullYear()}`;
+}
