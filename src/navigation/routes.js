@@ -4,6 +4,7 @@
 //   BOOK_DETAIL      -> { productId: number }
 //   KIT_DETAIL       -> { productId: number }
 //   ORDER_CONFIRMED  -> { order: object }  (pedido devolvido pelo POST /orders)
+//   ORDER_DETAIL     -> { order: object }  (pedido vindo do histórico)
 export const ROUTES = {
   HOME: 'HomeMain',
   CATEGORY_RESULTS: 'CategoryResults',
@@ -13,4 +14,6 @@ export const ROUTES = {
   CART: 'CartMain',
   ORDER_SUMMARY: 'OrderSummary',
   ORDER_CONFIRMED: 'OrderConfirmed',
+  ORDERS: 'OrdersMain',
+  ORDER_DETAIL: 'OrderDetail',
 };

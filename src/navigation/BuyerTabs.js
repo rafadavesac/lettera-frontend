@@ -5,7 +5,7 @@ import { useCart } from '../hooks/useCart';
 import HomeStack from './HomeStack';
 import KitsStack from './KitsStack';
 import CartStack from './CartStack';
-import OrdersScreen from '../screens/buyer/OrdersScreen';
+import OrdersStack from './OrdersStack';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
@@ -37,7 +37,7 @@ export default function BuyerTabs() {
         component={CartStack}
         options={{ title: 'Carrinho', tabBarBadge: itemCount > 0 ? itemCount : undefined }}
       />
-      <Tab.Screen name="Orders" component={OrdersScreen} options={{ title: 'Pedidos' }} />
+      <Tab.Screen name="Orders" component={OrdersStack} options={{ title: 'Pedidos' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
     </Tab.Navigator>
   );
