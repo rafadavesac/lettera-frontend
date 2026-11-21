@@ -3,6 +3,7 @@
 //   CATEGORY_RESULTS -> { category?: string, search?: string }
 //   BOOK_DETAIL      -> { productId: number }
 //   KIT_DETAIL       -> { productId: number }
+//   ORDER_CONFIRMED  -> { order: object }  (pedido devolvido pelo POST /orders)
 export const ROUTES = {
   HOME: 'HomeMain',
   CATEGORY_RESULTS: 'CategoryResults',
@@ -10,4 +11,6 @@ export const ROUTES = {
   KITS: 'KitsMain',
   KIT_DETAIL: 'KitDetail',
   CART: 'CartMain',
+  ORDER_SUMMARY: 'OrderSummary',
+  ORDER_CONFIRMED: 'OrderConfirmed',
 };

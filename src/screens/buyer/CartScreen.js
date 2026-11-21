@@ -3,7 +3,10 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../theme';
 import { useCart } from '../../hooks/useCart';
 import { MAX_QUANTITY_PER_ITEM } from '../../context/cartReducer';
-import { formatBookCount, formatPrice } from '../../utils/format';
+import { ROUTES } from '../../navigation/routes';
+import { formatPrice } from '../../utils/format';
+import { getItemSubtitle } from '../../utils/products';
+import Button from '../../components/Button';
 import CartItemRow from '../../components/CartItemRow';
 import EmptyState from '../../components/EmptyState';
 import Header from '../../components/Header';
@@ -12,16 +15,16 @@ const { colors, fonts, fontSizes, layout, spacing } = theme;
 
 const Separator = () => <View style={styles.separator} />;
 
-// Aba Carrinho: lista os itens com quantidade e remoção, e mostra o total.
-// Custo: a FlatList desenha só os itens visíveis, O(v) por tela; o total já
-// vem calculado do contexto (O(n) só quando o carrinho muda).
+// Aba Carrinho: lista os itens com quantidade e remoção, mostra o total e leva
+// ao resumo do pedido. Custo: a FlatList desenha só os itens visíveis, O(v)
+// por tela; o total já vem calculado do contexto (O(n) só quando muda).
 export default function CartScreen({ navigation }) {
   const { items, total, itemCount, setQuantity, removeItem } = useCart();
 
   const renderItem = ({ item }) => (
     <CartItemRow
       title={item.title}
-      subtitle={item.isKit ? formatBookCount(item.bookCount) : item.author}
+      subtitle={getItemSubtitle(item)}
       price={item.price}
       quantity={item.quantity}
       imageUri={item.imageUri}
@@ -55,10 +58,17 @@ export default function CartScreen({ navigation }) {
           />
 
           <View style={styles.footer}>
-            <Text style={styles.totalLabel}>
-              {`Total (${itemCount} ${itemCount === 1 ? 'item' : 'itens'})`}
-            </Text>
-            <Text style={styles.total}>{formatPrice(total)}</Text>
+            <View>
+              <Text style={styles.totalLabel}>
+                {`Total (${itemCount} ${itemCount === 1 ? 'item' : 'itens'})`}
+              </Text>
+              <Text style={styles.total}>{formatPrice(total)}</Text>
+            </View>
+            <Button
+              title="Finalizar compra"
+              onPress={() => navigation.navigate(ROUTES.ORDER_SUMMARY)}
+              style={styles.action}
+            />
           </View>
         </>
       )}
@@ -81,7 +91,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: spacing.lg,
     paddingHorizontal: layout.screenPadding,
     paddingVertical: spacing.md,
     backgroundColor: colors.surface,
@@ -90,12 +100,15 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontFamily: fonts.body,
-    fontSize: fontSizes.body,
+    fontSize: fontSizes.caption,
     color: colors.textMuted,
   },
   total: {
     fontFamily: fonts.bodySemiBold,
     fontSize: fontSizes.title,
     color: colors.primary,
+  },
+  action: {
+    flex: 1,
   },
 });

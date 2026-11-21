@@ -14,6 +14,7 @@ function toDrawnBook(dto) {
 // `draws` vira uma lista de listas de livros: um sorteio por unidade do kit
 // (kit com quantidade 2 -> 2 sorteios). Livro avulso tem `draws` vazio.
 function toOrderItem(dto) {
+    const draws = (dto.draws ?? []).map((draw) => draw.books.map(toDrawnBook));
   return {
     productId: dto.productId,
     type: dto.type,
@@ -24,7 +25,8 @@ function toOrderItem(dto) {
     unitPrice: dto.unitPrice,
     quantity: dto.quantity,
     subtotal: dto.subtotal,
-    draws: (dto.draws ?? []).map((draw) => draw.books.map(toDrawnBook)),
+    bookCount: draws[0]?.length ?? null, // livros por unidade do kit (vem do sorteio)
+draws,
   };
 }
 
