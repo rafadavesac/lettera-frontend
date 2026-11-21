@@ -1,20 +1,30 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../theme';
+import { flattenDraws } from '../../utils/draws';
 import { formatDate, formatPrice } from '../../utils/format';
 import { getItemSubtitle } from '../../utils/products';
 import Button from '../../components/Button';
+import DrawnBookRow from '../../components/DrawnBookRow';
 import Header from '../../components/Header';
+import KitReveal from '../../components/KitReveal';
 import OrderItemRow from '../../components/OrderItemRow';
 
 const { colors, fonts, fontSizes, layout, spacing } = theme;
 
 // Pedido confirmado. Parâmetro da rota: { order } (o pedido que o POST /orders
-// devolveu, então não precisa de nova chamada). Sem botão de voltar: o pedido
-// já foi feito. Custo: O(n) para desenhar os n itens do pedido.
+// devolveu, então não precisa de nova chamada). Se o pedido tem kits, começa
+// pela revelação dos livros sorteados e só depois mostra o resumo. Sem botão
+// de voltar: o pedido já foi feito. Custo: O(i + d + b) para montar a tela.
 export default function OrderConfirmedScreen({ navigation, route }) {
   const { order } = route.params;
+  const boxes = useMemo(() => flattenDraws(order), [order]);
+  const [revealed, setRevealed] = useState(boxes.length === 0);
+
+  if (!revealed) {
+    return <KitReveal boxes={boxes} onFinish={() => setRevealed(true)} />;
+  }
 
   // Volta a pilha do Carrinho ao início (vazio) antes de trocar de aba; assim,
   // tocar depois na aba Carrinho não mostra esta tela de novo.
@@ -51,6 +61,28 @@ export default function OrderConfirmedScreen({ navigation, route }) {
             />
           ))}
         </View>
+
+        {boxes.length > 0 ? (
+          <>
+            <Text style={[styles.sectionTitle, styles.drawsTitle]}>Seus livros sorteados</Text>
+            {boxes.map((box) => (
+              <View key={box.key} style={styles.box}>
+                <Text style={styles.boxLabel}>{box.label}</Text>
+                <View style={styles.list}>
+                  {box.books.map((book) => (
+                    <DrawnBookRow
+                      key={`${box.key}-${book.id}`}
+                      title={book.title}
+                      author={book.author}
+                      category={book.category}
+                      imageUri={book.imageUri}
+                    />
+                  ))}
+                </View>
+              </View>
+            ))}
+          </>
+        ) : null}
 
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>Total</Text>
@@ -100,8 +132,20 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: spacing.md,
   },
+  drawsTitle: {
+    marginTop: spacing.xl,
+  },
   list: {
     gap: spacing.md,
+  },
+  box: {
+    marginBottom: spacing.lg,
+  },
+  boxLabel: {
+    fontFamily: fonts.bodySemiBold,
+    fontSize: fontSizes.body,
+    color: colors.textMuted,
+    marginBottom: spacing.sm,
   },
   totalRow: {
     flexDirection: 'row',
