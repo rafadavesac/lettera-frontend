@@ -21,6 +21,7 @@ export default function CartItemRow({
   isKit = false,
   onChangeQuantity,
   onRemove,
+  maxQuantity,
   style,
 }) {
   return (
@@ -42,7 +43,7 @@ export default function CartItemRow({
         ) : null}
 
         <View style={styles.footer}>
-          <QuantityStepper value={quantity} onChange={onChangeQuantity} />
+          <QuantityStepper value={quantity} onChange={onChangeQuantity} max={maxQuantity} />
           <Text style={styles.price}>{formatPrice(price * quantity)}</Text>
         </View>
       </View>

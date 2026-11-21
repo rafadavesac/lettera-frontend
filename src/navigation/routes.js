@@ -1,4 +1,4 @@
-// Nomes das rotas do catálogo em um só lugar (sem strings soltas nas telas).
+// Nomes das rotas do comprador em um só lugar (sem strings soltas nas telas).
 // Parâmetros:
 //   CATEGORY_RESULTS -> { category?: string, search?: string }
 //   BOOK_DETAIL      -> { productId: number }
@@ -9,4 +9,5 @@ export const ROUTES = {
   BOOK_DETAIL: 'BookDetail',
   KITS: 'KitsMain',
   KIT_DETAIL: 'KitDetail',
+  CART: 'CartMain',
 };

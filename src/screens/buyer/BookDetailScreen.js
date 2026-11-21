@@ -2,6 +2,9 @@ import React from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../theme';
 import { useProduct } from '../../hooks/useProducts';
+import { useCart } from '../../hooks/useCart';
+import { useTransientFlag } from '../../hooks/useTransientFlag';
+import { MAX_QUANTITY_PER_ITEM } from '../../context/cartReducer';
 import CoverImage from '../../components/CoverImage';
 import DetailScaffold from '../../components/DetailScaffold';
 import Tag from '../../components/Tag';
@@ -14,9 +17,20 @@ export default function BookDetailScreen({ navigation, route }) {
   const { productId } = route.params;
   const { data: book, loading, error, reload } = useProduct(productId);
 
-  // Provisório: o carrinho será criado no próximo chat.
-  // Lá, trocar este Alert por addItem(book).
-  const handleAddToCart = () => Alert.alert('Carrinho', 'O carrinho chega no próximo passo.');
+   const { addItem } = useCart();
+  const [added, flashAdded] = useTransientFlag();
+
+  // Soma 1 ao item; no limite do contrato, avisa em vez de adicionar.
+  const handleAddToCart = () => {
+    if (!addItem(book)) {
+      Alert.alert(
+        'Limite atingido',
+        `Você pode levar até ${MAX_QUANTITY_PER_ITEM} unidades de cada item.`
+      );
+      return;
+    }
+    flashAdded();
+  };
 
   return (
     <DetailScaffold
@@ -26,7 +40,7 @@ export default function BookDetailScreen({ navigation, route }) {
       error={error}
       onRetry={reload}
       price={book?.price}
-      actionLabel="Adicionar ao carrinho"
+      actionLabel={added ? 'Adicionado!' : 'Adicionar ao carrinho'}
       onAction={handleAddToCart}
     >
       {book ? (

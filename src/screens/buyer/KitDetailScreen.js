@@ -3,6 +3,9 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../theme';
 import { useProduct } from '../../hooks/useProducts';
+import { useCart } from '../../hooks/useCart';
+import { useTransientFlag } from '../../hooks/useTransientFlag';
+import { MAX_QUANTITY_PER_ITEM } from '../../context/cartReducer';
 import { formatBookCount } from '../../utils/format';
 import CoverImage from '../../components/CoverImage';
 import DetailScaffold from '../../components/DetailScaffold';
@@ -19,7 +22,20 @@ export default function KitDetailScreen({ navigation, route }) {
 
   // Provisório: o carrinho será criado no próximo chat.
   // Lá, trocar este Alert por addItem(kit).
-  const handleAddToCart = () => Alert.alert('Carrinho', 'O carrinho chega no próximo passo.');
+    const { addItem } = useCart();
+  const [added, flashAdded] = useTransientFlag();
+
+  // Soma 1 ao kit; no limite do contrato, avisa em vez de adicionar.
+  const handleAddToCart = () => {
+    if (!addItem(kit)) {
+      Alert.alert(
+        'Limite atingido',
+        `Você pode levar até ${MAX_QUANTITY_PER_ITEM} unidades de cada item.`
+      );
+      return;
+    }
+    flashAdded();
+  };
 
   return (
     <DetailScaffold
@@ -29,7 +45,7 @@ export default function KitDetailScreen({ navigation, route }) {
       error={error}
       onRetry={reload}
       price={kit?.price}
-      actionLabel="Adicionar ao carrinho"
+      actionLabel={added ? 'Adicionado!' : 'Adicionar ao carrinho'}
       onAction={handleAddToCart}
     >
       {kit ? (
