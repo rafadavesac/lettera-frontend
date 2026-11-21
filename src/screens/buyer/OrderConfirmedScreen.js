@@ -3,13 +3,11 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../theme';
 import { flattenDraws } from '../../utils/draws';
-import { formatDate, formatPrice } from '../../utils/format';
-import { getItemSubtitle } from '../../utils/products';
+import { formatDate } from '../../utils/format';
 import Button from '../../components/Button';
-import DrawnBookRow from '../../components/DrawnBookRow';
 import Header from '../../components/Header';
 import KitReveal from '../../components/KitReveal';
-import OrderItemRow from '../../components/OrderItemRow';
+import OrderBreakdown from '../../components/OrderBreakdown';
 
 const { colors, fonts, fontSizes, layout, spacing } = theme;
 
@@ -46,48 +44,7 @@ export default function OrderConfirmedScreen({ navigation, route }) {
           </Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Itens do pedido</Text>
-        <View style={styles.list}>
-          {order.items.map((item) => (
-            <OrderItemRow
-              key={item.productId}
-              title={item.title}
-              subtitle={getItemSubtitle(item)}
-              quantity={item.quantity}
-              unitPrice={item.unitPrice}
-              subtotal={item.subtotal}
-              imageUri={item.imageUri}
-              isKit={item.isKit}
-            />
-          ))}
-        </View>
-
-        {boxes.length > 0 ? (
-          <>
-            <Text style={[styles.sectionTitle, styles.drawsTitle]}>Seus livros sorteados</Text>
-            {boxes.map((box) => (
-              <View key={box.key} style={styles.box}>
-                <Text style={styles.boxLabel}>{box.label}</Text>
-                <View style={styles.list}>
-                  {box.books.map((book) => (
-                    <DrawnBookRow
-                      key={`${box.key}-${book.id}`}
-                      title={book.title}
-                      author={book.author}
-                      category={book.category}
-                      imageUri={book.imageUri}
-                    />
-                  ))}
-                </View>
-              </View>
-            ))}
-          </>
-        ) : null}
-
-        <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.total}>{formatPrice(order.total)}</Text>
-        </View>
+        <OrderBreakdown order={order} />
       </ScrollView>
 
       <View style={styles.footer}>
@@ -125,43 +82,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
     fontSize: fontSizes.bodyLarge,
     color: colors.textMuted,
-  },
-  sectionTitle: {
-    fontFamily: fonts.title,
-    fontSize: fontSizes.subtitle,
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
-  drawsTitle: {
-    marginTop: spacing.xl,
-  },
-  list: {
-    gap: spacing.md,
-  },
-  box: {
-    marginBottom: spacing.lg,
-  },
-  boxLabel: {
-    fontFamily: fonts.bodySemiBold,
-    fontSize: fontSizes.body,
-    color: colors.textMuted,
-    marginBottom: spacing.sm,
-  },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: spacing.lg,
-  },
-  totalLabel: {
-    fontFamily: fonts.body,
-    fontSize: fontSizes.bodyLarge,
-    color: colors.textMuted,
-  },
-  total: {
-    fontFamily: fonts.bodySemiBold,
-    fontSize: fontSizes.title,
-    color: colors.primary,
   },
   footer: {
     gap: spacing.md,
