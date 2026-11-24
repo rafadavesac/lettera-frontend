@@ -10,8 +10,9 @@ import {
 } from 'react-native';
 import { theme } from '../../theme';
 import { useCategories, useProduct } from '../../hooks/useProducts';
-import { useSaveProduct } from '../../hooks/useSellerProducts';
+import { useSaveProduct, useUploadProductImage } from '../../hooks/useSellerProducts';
 import { PRODUCT_TYPES } from '../../services/products/productMapper';
+import { pickProductImage } from '../../utils/imagePicker';
 import {
   EMPTY_FORM,
   MAX_KIT_BOOKS,
@@ -24,6 +25,7 @@ import CategoryChip from '../../components/CategoryChip';
 import EmptyState from '../../components/EmptyState';
 import ErrorBanner from '../../components/ErrorBanner';
 import Header from '../../components/Header';
+import ImageUploadBox from '../../components/ImageUploadBox';
 import QuantityStepper from '../../components/QuantityStepper';
 import SegmentedControl from '../../components/SegmentedControl';
 import TextField from '../../components/TextField';
@@ -90,6 +92,7 @@ function EditProduct({ productId, onBack }) {
       title="Editar produto"
       productId={productId}
       initialValues={toFormValues(data)}
+      imageUri={data.imageUri}
       onBack={onBack}
       onDone={onBack}
     />
@@ -97,12 +100,15 @@ function EditProduct({ productId, onBack }) {
 }
 
 // Custo: O(1) por campo; a validação roda uma vez ao salvar.
-function ProductForm({ title, productId, initialValues, onBack, onDone }) {
+function ProductForm({ title, productId, initialValues, imageUri, onBack, onDone }) {
   const categories = useCategories();
   const { save, saving, error: saveError, clearError } = useSaveProduct();
+  const { upload, uploading, error: uploadError, clearError: clearUploadError } = useUploadProductImage();
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({}); // { campo: mensagem }
   const [savedId, setSavedId] = useState(productId); // vira o id do produto criado, para não duplicar ao tentar de novo
+  const [imageFile, setImageFile] = useState(null); // foto escolhida, ainda não enviada
+  const [imageError, setImageError] = useState(null);
 
   const isKit = values.type === PRODUCT_TYPES.KIT;
 
@@ -113,6 +119,18 @@ function ProductForm({ title, productId, initialValues, onBack, onDone }) {
     clearError();
   };
 
+  const handlePickImage = async () => {
+    setImageError(null);
+    clearUploadError();
+    const picked = await pickProductImage();
+    if (!picked) return; // cancelou
+    if (picked.error) {
+      setImageError(picked.error);
+      return;
+    }
+    setImageFile(picked.file);
+  };
+
   const handleSubmit = async () => {
     const found = validateProductForm(values);
     setErrors(found);
@@ -121,6 +139,14 @@ function ProductForm({ title, productId, initialValues, onBack, onDone }) {
     const { ok, data } = await save(savedId, values);
     if (!ok) return; // a mensagem fica na faixa de erro
     setSavedId(data.id);
+
+    // A imagem precisa do id do produto: primeiro salva, depois envia. Se o
+    // envio falhar, o produto já existe (savedId): tentar de novo só edita
+    // e reenvia a imagem, sem criar duplicado.
+    if (imageFile) {
+      const uploaded = await upload(data.id, imageFile);
+      if (!uploaded.ok) return;
+    }
     onDone();
   };
 
@@ -136,11 +162,20 @@ function ProductForm({ title, productId, initialValues, onBack, onDone }) {
         keyboardShouldPersistTaps="handled"
       >
         <ErrorBanner message={saveError} />
+        <ErrorBanner
+          message={uploadError ? `O produto foi salvo, mas a imagem não foi enviada. ${uploadError}` : null}
+        />
 
         <SegmentedControl
           options={TYPE_OPTIONS}
           value={values.type}
           onChange={(type) => setField('type', type)}
+        />
+
+        <ImageUploadBox
+          uri={imageFile?.uri ?? imageUri}
+          onPress={handlePickImage}
+          error={imageError}
         />
 
         <TextField
@@ -215,7 +250,7 @@ function ProductForm({ title, productId, initialValues, onBack, onDone }) {
         <Button
           title={productId ? 'Salvar alterações' : 'Salvar produto'}
           onPress={handleSubmit}
-          loading={saving}
+          loading={saving || uploading}
           style={styles.submit}
         />
       </ScrollView>
