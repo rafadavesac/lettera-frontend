@@ -1,3 +1,5 @@
+import { resolveImageUrl } from '../../utils/imageUrl';
+
 export const PRODUCT_TYPES = { BOOK: 'BOOK', KIT: 'KIT' };
 
 // Traduz o JSON do contrato da API para o formato que as telas e os cards usam.
@@ -13,7 +15,7 @@ export function toProduct(dto) {
     description: dto.description ?? '',
     category: dto.category,
     price: dto.price,
-    imageUri: dto.imageUrl ?? null,
+    imageUri: resolveImageUrl(dto.image),
     bookCount: dto.bookCount ?? null,
   };
 }
