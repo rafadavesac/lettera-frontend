@@ -51,7 +51,7 @@ export default function KitReveal({ boxes, onFinish }) {
           <View style={styles.books}>
             <Text style={styles.booksTitle}>Seus livros são:</Text>
             {box.books.map((book, i) => (
-              <FadeInView key={`${box.key}-${book.id}`} delay={i * 300}>
+              <FadeInView key={`${box.key}-${i}`} delay={i * 300}>
                 <DrawnBookRow
                   title={book.title}
                   author={book.author}

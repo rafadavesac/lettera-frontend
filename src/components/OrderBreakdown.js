@@ -41,9 +41,9 @@ export default function OrderBreakdown({ order }) {
             <View key={box.key} style={styles.box}>
               <Text style={styles.boxLabel}>{box.label}</Text>
               <View style={styles.list}>
-                {box.books.map((book) => (
+                  {box.books.map((book, i) => (
                   <DrawnBookRow
-                    key={`${box.key}-${book.id}`}
+                    key={`${box.key}-${i}`}
                     title={book.title}
                     author={book.author}
                     category={book.category}

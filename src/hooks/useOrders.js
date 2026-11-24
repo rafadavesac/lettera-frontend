@@ -9,6 +9,11 @@ export function useMyOrders() {
   return useAsyncData(() => orderService.listMine(), []);
 }
 
+// Pedido completo (com os livros sorteados) pelo id. data = pedido.
+export function useOrder(orderId) {
+  return useAsyncData(() => orderService.getById(orderId), [orderId]);
+}
+
 // Finalizar o pedido (ação, não leitura): `submit(items)` devolve o pedido
 // criado, ou null se falhou (a mensagem fica em `error`).
 export function useCreateOrder() {

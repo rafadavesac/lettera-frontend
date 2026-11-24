@@ -4,7 +4,7 @@
 //   BOOK_DETAIL      -> { productId: number }
 //   KIT_DETAIL       -> { productId: number }
 //   ORDER_CONFIRMED  -> { order: object }  (pedido devolvido pelo POST /orders)
-//   ORDER_DETAIL     -> { order: object }  (pedido vindo do histórico)
+//   ORDER_DETAIL     -> { orderId: number }  (a tela busca o pedido por GET /orders/{id})
 export const ROUTES = {
   HOME: 'HomeMain',
   CATEGORY_RESULTS: 'CategoryResults',

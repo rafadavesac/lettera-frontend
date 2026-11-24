@@ -38,7 +38,7 @@ export default function OrdersScreen({ navigation }) {
       date={item.createdAt}
       itemCount={item.itemCount}
       total={item.total}
-      onPress={() => navigation.navigate(ROUTES.ORDER_DETAIL, { order: item })}
+      onPress={() => navigation.navigate(ROUTES.ORDER_DETAIL, { orderId: item.id })}
     />
   );
 

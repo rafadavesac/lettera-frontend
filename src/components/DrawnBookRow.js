@@ -23,7 +23,7 @@ export default function DrawnBookRow({ title, author, category, imageUri, style 
             {author}
           </Text>
         ) : null}
-        <Tag label={category} style={styles.tag} />
+        {category ? <Tag label={category} style={styles.tag} /> : null}
       </View>
     </View>
   );

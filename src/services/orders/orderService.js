@@ -1,10 +1,8 @@
-import { toOrder } from './orderMapper';
-
-export const DEFAULT_ORDERS_PAGE_SIZE = 20;
+import { toOrder, toOrderSummary } from './orderMapper';
 
 // Cria o serviço de pedidos a partir de uma "fonte" (mock ou API): qualquer
-// objeto com create e listMine. Depende da abstração, não da implementação
-// concreta, e só cuida de montar a requisição e mapear a resposta.
+// objeto com create, listMine e getById. Depende da abstração, não da
+// implementação concreta, e só cuida de montar a requisição e mapear a resposta.
 export function createOrderService(source) {
   return {
     // `items`: [{ productId, quantity }] (o carrinho pode passar mais campos;
@@ -16,11 +14,17 @@ export function createOrderService(source) {
       return toOrder(await source.create(request));
     },
 
-    // Pedidos do comprador logado, do mais recente ao mais antigo.
-    // Custo: O(k) pedidos da página (vezes o tamanho de cada um).
-    async listMine({ page = 0, size = DEFAULT_ORDERS_PAGE_SIZE } = {}) {
-      const result = await source.listMine({ page, size });
-      return { items: result.content.map(toOrder), total: result.totalElements };
+    // Histórico do comprador logado: resumos, do mais recente ao mais antigo
+    // (lista simples, sem paginação, como no contrato). Custo: O(k).
+    async listMine() {
+      const summaries = await source.listMine();
+      const items = summaries.map(toOrderSummary);
+      return { items, total: items.length };
+    },
+
+    // Pedido completo, com os livros sorteados (GET /orders/{id}).
+    async getById(id) {
+      return toOrder(await source.getById(id));
     },
   };
 }

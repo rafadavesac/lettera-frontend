@@ -1,8 +1,8 @@
 import { PRODUCT_TYPES } from '../products/productMapper';
 
-// Fonte de dados de exemplo, no mesmo formato do contrato de pedidos, incluindo
-// as regras de validação e o sorteio que o backend fará. Os pedidos ficam só
-// em memória: somem ao recarregar o app.
+// Fonte de dados de exemplo, no mesmo formato do contrato oficial de pedidos,
+// incluindo as regras de validação e o sorteio que o backend fará. Os pedidos
+// ficam só em memória: somem ao recarregar o app.
 const FAKE_LATENCY_MS = 600;
 const MAX_QUANTITY_PER_ITEM = 20;
 
@@ -45,13 +45,13 @@ function validateItems(items) {
   }
 }
 
-const toBookDto = (book) => ({
-  bookId: book.id,
+const toDrawnBookDto = (book) => ({
   title: book.title,
   author: book.author,
-  imageUrl: book.imageUri,
-  category: book.category,
+  image: book.imageUri,
 });
+
+const countUnits = (items) => items.reduce((sum, item) => sum + item.quantity, 0);
 
 // `catalog` é o serviço de produtos (getById e list); no backend real, o
 // order-api consulta o product-api do mesmo jeito.
@@ -76,28 +76,27 @@ export function createMockOrderSource({ catalog, drawStrategy = randomDrawStrate
   async function buildItem({ productId, quantity }, loadPool) {
     const product = await catalog.getById(productId); // 404 se não existir
 
-    let draws = [];
+    // Como no contrato: `drawnBooks` junta os livros de todas as unidades
+    // (bookCount × quantity), os de cada unidade em sequência.
+    const drawnBooks = [];
     if (product.isKit) {
       const pool = await loadPool(product.category);
       if (pool.length < product.bookCount) {
         throw fail(409, 'Não há livros suficientes para sortear este kit.');
       }
-      // Um sorteio independente por unidade do kit.
-      draws = Array.from({ length: quantity }, () => ({
-        books: drawStrategy.draw(pool, product.bookCount).map(toBookDto),
-      }));
+      for (let unit = 0; unit < quantity; unit += 1) {
+        drawnBooks.push(...drawStrategy.draw(pool, product.bookCount).map(toDrawnBookDto));
+      }
     }
 
     return {
       productId: product.id,
-      type: product.type,
       title: product.title,
-      author: product.author,
-      imageUrl: product.imageUri,
+      type: product.type,
       unitPrice: product.price,
       quantity,
       subtotal: round2(product.price * quantity),
-      draws,
+      drawnBooks,
     };
   }
 
@@ -122,16 +121,24 @@ export function createMockOrderSource({ catalog, drawStrategy = randomDrawStrate
       return order;
     },
 
-    // Pagina como o backend fará. Custo: O(k), com k pedidos da página.
-    async listMine({ page = 0, size = 20 } = {}) {
+    // Resumos, do mais recente ao mais antigo. Custo: O(k * i), com k pedidos
+    // e i itens por pedido (para somar as quantidades).
+    async listMine() {
       await delay(FAKE_LATENCY_MS);
-      const start = page * size;
-      return {
-        content: orders.slice(start, start + size),
-        totalElements: orders.length,
-        totalPages: Math.ceil(orders.length / size),
-        number: page,
-      };
+      return orders.map((order) => ({
+        id: order.id,
+        createdAt: order.createdAt,
+        total: order.total,
+        itemCount: countUnits(order.items),
+      }));
+    },
+
+    // Custo: O(k) (busca linear); na API real é uma consulta por chave primária.
+    async getById(id) {
+      await delay(FAKE_LATENCY_MS);
+      const order = orders.find((candidate) => candidate.id === Number(id));
+      if (!order) throw fail(404, 'Pedido não encontrado.');
+      return order;
     },
   };
 }
