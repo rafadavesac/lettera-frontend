@@ -30,7 +30,15 @@
           "backgroundColor": "#F6F2E9"
         }
       ],
-      "expo-secure-store"
+            "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "A Lettera precisa acessar suas fotos para você escolher a capa do produto.",
+          "cameraPermission": false
+        }
+      ]
+    
     ]
   }
 }
