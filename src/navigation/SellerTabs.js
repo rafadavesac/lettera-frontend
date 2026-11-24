@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { baseTabOptions } from './tabOptions';
-import MyProductsScreen from '../screens/seller/MyProductsScreen';
+import SellerProductsStack from './SellerProductsStack';
 import SalesScreen from '../screens/seller/SalesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
@@ -23,7 +23,7 @@ export default function SellerTabs() {
         ),
       })}
     >
-      <Tab.Screen name="MyProducts" component={MyProductsScreen} options={{ title: 'Meus produtos' }} />
+      <Tab.Screen name="MyProducts" component={SellerProductsStack} options={{ title: 'Meus produtos' }} />
       <Tab.Screen name="Sales" component={SalesScreen} options={{ title: 'Vendas' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
     </Tab.Navigator>
