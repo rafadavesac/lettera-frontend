@@ -1,10 +1,10 @@
-// Lista fixa de categorias, por enquanto. Devolve Promise para ter a mesma
-// forma de uma chamada de rede: quando a rota /products/categories existir,
-// só este arquivo muda (as telas continuam iguais).
-const CATEGORIES = ['Terror', 'Fantasia', 'Romance', 'Ficção científica', 'Suspense'];
-
-export const categoryService = {
-  async list() {
-    return CATEGORIES;
-  },
-};
+// Cria o serviço de categorias a partir de uma "fonte" (mock ou API): qualquer
+// objeto com `list`. Mesmo padrão do serviço de produtos (inversão de dependência).
+export function createCategoryService(source) {
+  return {
+    // Lista de textos. A ordenação vem da fonte. Custo: O(1) no app.
+    async list() {
+      return source.list();
+    },
+  };
+}
