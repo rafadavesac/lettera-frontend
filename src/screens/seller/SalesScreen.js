@@ -1,25 +1,31 @@
-import React, { useCallback, useRef } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { theme } from '../../theme';
 import { useSales } from '../../hooks/useSales';
 import { formatPrice } from '../../utils/format';
+import { formatPeriod, lastPeriods, toPeriod } from '../../utils/period';
+import CategoryChip from '../../components/CategoryChip';
 import EmptyState from '../../components/EmptyState';
 import Header from '../../components/Header';
 import SaleRow from '../../components/SaleRow';
 
 const { colors, fonts, fontSizes, layout, radius, shadows, spacing } = theme;
 
+const PERIOD_COUNT = 12; // meses disponíveis no seletor
+
 const Separator = () => <View style={styles.separator} />;
 
 const formatSaleCount = (count) => `${count} ${count === 1 ? 'venda' : 'vendas'}`;
 
-// Histórico de vendas do vendedor (GET /ws/orders/sales): total no topo e,
-// abaixo, uma linha por item vendido, da mais recente à mais antiga.
-// Recarrega ao voltar à aba (foco) e ao puxar a lista.
+// Histórico de vendas do vendedor (GET /ws/orders/sales?period=AAAA-MM): seletor
+// de mês no topo, total vendido e, abaixo, uma linha por item vendido, da mais
+// recente à mais antiga. Recarrega ao voltar à aba (foco) e ao puxar a lista.
 // Custo: a FlatList desenha só os itens visíveis, O(v) por tela.
 export default function SalesScreen() {
-  const { data, loading, error, reload } = useSales();
+  const periods = useMemo(() => lastPeriods(PERIOD_COUNT), []);
+  const [period, setPeriod] = useState(() => toPeriod(new Date()));
+  const { data, loading, error, reload } = useSales(period);
   const sales = data?.items ?? [];
 
   // Pula o primeiro foco: a primeira busca já acontece ao abrir a tela.
@@ -40,7 +46,7 @@ export default function SalesScreen() {
 
   const renderSummary = () => (
     <View style={styles.summary}>
-      <Text style={styles.summaryLabel}>Total vendido</Text>
+      <Text style={styles.summaryLabel}>{`Total vendido em ${formatPeriod(period)}`}</Text>
       <Text style={styles.summaryValue}>{formatPrice(data.totalRevenue)}</Text>
       <Text style={styles.summaryCount}>{formatSaleCount(sales.length)}</Text>
     </View>
@@ -72,8 +78,8 @@ export default function SalesScreen() {
       return (
         <EmptyState
           icon="cash-outline"
-          title="Nenhuma venda ainda"
-          message="Quando alguém comprar um dos seus produtos, a venda aparece aqui."
+          title="Nenhuma venda neste mês"
+          message={`Não há vendas em ${formatPeriod(period)}. Escolha outro mês acima.`}
         />
       );
     }
@@ -95,6 +101,23 @@ export default function SalesScreen() {
   return (
     <View style={styles.screen}>
       <Header title="Vendas" />
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.chipsScroll}
+        contentContainerStyle={styles.chips}
+      >
+        {periods.map((value) => (
+          <CategoryChip
+            key={value}
+            label={formatPeriod(value)}
+            selected={value === period}
+            onPress={() => setPeriod(value)}
+          />
+        ))}
+      </ScrollView>
+
       {renderBody()}
     </View>
   );
@@ -104,6 +127,14 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  chipsScroll: {
+    flexGrow: 0, // sem isso, a lista horizontal ocuparia a altura da tela
+  },
+  chips: {
+    paddingHorizontal: layout.screenPadding,
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
   },
   centered: {
     flex: 1,
