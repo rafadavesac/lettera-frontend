@@ -9,6 +9,7 @@ import axios from 'axios';
 import { API_BASE_URL, API_TIMEOUT_MS } from '../config/api';
 import { getToken } from '../utils/tokenStorage';
 
+// eslint-disable-next-line import/no-named-as-default-member
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT_MS,
