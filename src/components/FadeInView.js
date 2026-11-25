@@ -1,11 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Animated } from 'react-native';
 
 // Faz o conteúdo aparecer com fade e leve subida. `delay` permite escalonar
 // vários itens (um após o outro). Usa só o Animated do React Native, no
 // driver nativo. Custo: O(1) por elemento animado.
 export default function FadeInView({ delay = 0, duration = 450, style, children }) {
-  const progress = useRef(new Animated.Value(0)).current;
+  // useState com inicializador: cria o Animated.Value uma única vez (a regra
+  // react-hooks/refs não aceita ler ref.current durante a renderização).
+  const [progress] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     const animation = Animated.timing(progress, {
