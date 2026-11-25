@@ -13,6 +13,7 @@ import { theme } from '../../theme';
 import Button from '../../components/Button';
 import TextField from '../../components/TextField';
 import ErrorBanner from '../../components/ErrorBanner';
+import Logo from '../../components/Logo';
 
 export default function SignUpScreen({ navigation }) {
   const { signUp } = useAuth();
@@ -69,6 +70,7 @@ export default function SignUpScreen({ navigation }) {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
+        <Logo variant="emblem" width={120} style={styles.logo} />
         <Text style={styles.title}>Criar conta</Text>
         <Text style={styles.subtitle}>Descubra seu próximo livro</Text>
 
@@ -158,6 +160,9 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSizes.headline,
     color: theme.colors.primary,
     textAlign: 'center',
+  },
+    logo: {
+    marginBottom: theme.spacing.md,
   },
   subtitle: {
     fontFamily: theme.fonts.body,

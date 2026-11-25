@@ -13,6 +13,7 @@ import { theme } from '../../theme';
 import Button from '../../components/Button';
 import TextField from '../../components/TextField';
 import ErrorBanner from '../../components/ErrorBanner';
+import Logo from '../../components/Logo';
 
 export default function LoginScreen({ navigation }) {
   const { signIn } = useAuth();
@@ -59,7 +60,7 @@ export default function LoginScreen({ navigation }) {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>Lettera</Text>
+        <Logo width={240} style={styles.logo} />
         <Text style={styles.subtitle}>Entre na sua conta</Text>
 
         <ErrorBanner message={error} />
@@ -119,11 +120,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: theme.layout.screenPadding,
   },
-  title: {
-    fontFamily: theme.fonts.title,
-    fontSize: theme.fontSizes.headline,
-    color: theme.colors.primary,
-    textAlign: 'center',
+  logo: {
+    marginBottom: theme.spacing.lg,
   },
   subtitle: {
     fontFamily: theme.fonts.body,
