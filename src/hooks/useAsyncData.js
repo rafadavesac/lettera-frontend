@@ -9,6 +9,9 @@ export function useAsyncData(fetcher, deps = []) {
 
   useEffect(() => {
     let cancelled = false;
+    // Marcar "carregando" ao trocar filtro ou recarregar é o objetivo deste effect:
+    // os dados antigos continuam na tela enquanto a nova busca roda.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     fetcher()
