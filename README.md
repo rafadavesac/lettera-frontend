@@ -44,7 +44,7 @@ cd lettera-frontend
 npm install
 ```
 
-1. Abra `src/config/api.js` e coloque em `API_HOST` o IP do computador que roda o back-end (no Windows, o "Endereço IPv4" do Wi-Fi em `ipconfig`).
+1. 1. O app descobre sozinho o IP do computador que roda o back-end, a partir do servidor Expo, então não há IP para editar. Se o Docker rodar em outro computador (ou se usar o modo túnel do Expo), crie um arquivo `.env.local` com `EXPO_PUBLIC_API_HOST=<IP do computador>`.
 2. Inicie o projeto:
 
 ```bash
