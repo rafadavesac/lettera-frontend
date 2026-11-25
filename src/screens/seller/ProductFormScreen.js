@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../theme';
 import { useCategories, useProduct } from '../../hooks/useProducts';
 import { useSaveProduct, useUploadProductImage } from '../../hooks/useSellerProducts';
@@ -15,7 +16,7 @@ import { PRODUCT_TYPES } from '../../services/products/productMapper';
 import { pickProductImage } from '../../utils/imagePicker';
 import {
   EMPTY_FORM,
-  MAX_KIT_BOOKS,
+  KIT_BOOK_COUNT,
   MAX_LENGTH,
   toFormValues,
   validateProductForm,
@@ -26,11 +27,10 @@ import EmptyState from '../../components/EmptyState';
 import ErrorBanner from '../../components/ErrorBanner';
 import Header from '../../components/Header';
 import ImageUploadBox from '../../components/ImageUploadBox';
-import QuantityStepper from '../../components/QuantityStepper';
 import SegmentedControl from '../../components/SegmentedControl';
 import TextField from '../../components/TextField';
 
-const { colors, fonts, fontSizes, layout, spacing } = theme;
+const { colors, fonts, fontSizes, layout, radius, spacing } = theme;
 
 const TYPE_OPTIONS = [
   { value: PRODUCT_TYPES.BOOK, label: 'Livro' },
@@ -99,6 +99,19 @@ function EditProduct({ productId, onBack }) {
   );
 }
 
+// Monta o que vai para a API. O back-end define sozinho o título do kit
+// ("Kit <categoria>") e fixa 3 livros, então o app já envia esses valores e a
+// tela não precisa pedi-los ao vendedor. Custo: O(1).
+function buildPayload(values) {
+  if (values.type !== PRODUCT_TYPES.KIT) return values;
+  return {
+    ...values,
+    title: `Kit ${values.category}`,
+    author: '',
+    bookCount: KIT_BOOK_COUNT,
+  };
+}
+
 // Custo: O(1) por campo; a validação roda uma vez ao salvar.
 function ProductForm({ title, productId, initialValues, imageUri, onBack, onDone }) {
   const categories = useCategories();
@@ -119,6 +132,12 @@ function ProductForm({ title, productId, initialValues, imageUri, onBack, onDone
     clearError();
   };
 
+  // Trocar livro/kit muda quais campos existem: limpa os erros antigos.
+  const handleChangeType = (type) => {
+    setField('type', type);
+    setErrors({});
+  };
+
   const handlePickImage = async () => {
     setImageError(null);
     clearUploadError();
@@ -136,7 +155,7 @@ function ProductForm({ title, productId, initialValues, imageUri, onBack, onDone
     setErrors(found);
     if (Object.keys(found).length > 0) return; // erros por campo já aparecem na tela
 
-    const { ok, data } = await save(savedId, values);
+    const { ok, data } = await save(savedId, buildPayload(values));
     if (!ok) return; // a mensagem fica na faixa de erro
     setSavedId(data.id);
 
@@ -169,7 +188,7 @@ function ProductForm({ title, productId, initialValues, imageUri, onBack, onDone
         <SegmentedControl
           options={TYPE_OPTIONS}
           value={values.type}
-          onChange={(type) => setField('type', type)}
+          onChange={handleChangeType}
         />
 
         <ImageUploadBox
@@ -178,24 +197,33 @@ function ProductForm({ title, productId, initialValues, imageUri, onBack, onDone
           error={imageError}
         />
 
-        <TextField
-          label="Título"
-          value={values.title}
-          onChangeText={(text) => setField('title', text)}
-          error={errors.title}
-          maxLength={MAX_LENGTH.title}
-          autoCapitalize="sentences"
-        />
+        {isKit ? (
+          <View style={styles.callout}>
+            <Ionicons name="gift-outline" size={22} color={colors.primaryDark} />
+            <Text style={styles.calloutText}>
+              {`O título do kit é gerado pela categoria, e cada kit leva ${KIT_BOOK_COUNT} livros sorteados na compra.`}
+            </Text>
+          </View>
+        ) : (
+          <>
+            <TextField
+              label="Título"
+              value={values.title}
+              onChangeText={(text) => setField('title', text)}
+              error={errors.title}
+              maxLength={MAX_LENGTH.title}
+              autoCapitalize="sentences"
+            />
 
-        {isKit ? null : (
-          <TextField
-            label="Autor"
-            value={values.author}
-            onChangeText={(text) => setField('author', text)}
-            error={errors.author}
-            maxLength={MAX_LENGTH.author}
-            autoCapitalize="words"
-          />
+            <TextField
+              label="Autor"
+              value={values.author}
+              onChangeText={(text) => setField('author', text)}
+              error={errors.author}
+              maxLength={MAX_LENGTH.author}
+              autoCapitalize="words"
+            />
+          </>
         )}
 
         <TextField
@@ -234,19 +262,6 @@ function ProductForm({ title, productId, initialValues, imageUri, onBack, onDone
           keyboardType="decimal-pad"
         />
 
-        {isKit ? (
-          <View style={styles.group}>
-            <Text style={styles.label}>Livros no kit</Text>
-            <QuantityStepper
-              value={values.bookCount}
-              onChange={(count) => setField('bookCount', count)}
-              min={1}
-              max={MAX_KIT_BOOKS}
-            />
-            {errors.bookCount ? <Text style={styles.error}>{errors.bookCount}</Text> : null}
-          </View>
-        ) : null}
-
         <Button
           title={productId ? 'Salvar alterações' : 'Salvar produto'}
           onPress={handleSubmit}
@@ -272,6 +287,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenPadding,
     paddingBottom: spacing.xxl,
     gap: spacing.lg,
+  },
+  callout: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.lg,
+    borderRadius: radius.card,
+    backgroundColor: colors.accentGoldLight,
+  },
+  calloutText: {
+    flex: 1,
+    fontFamily: fonts.bodyMedium,
+    fontSize: fontSizes.body,
+    color: colors.primaryDark,
+    lineHeight: 20,
   },
   description: {
     minHeight: 120,

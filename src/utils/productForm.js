@@ -3,7 +3,7 @@
 // Funções puras, sem tela nem rede. Custo: O(1) por campo (textos curtos).
 import { PRODUCT_TYPES } from '../services/products/productMapper';
 
-export const MAX_KIT_BOOKS = 5; // limite de livros por kit no formulário
+export const KIT_BOOK_COUNT = 3; // fixo no back-end 
 export const MAX_LENGTH = { title: 120, author: 80, description: 500 };
 
 // Valores de um formulário novo. O preço é texto porque o usuário digita ("29,90").
@@ -53,13 +53,13 @@ export function validateProductForm(values) {
   const author = values.author.trim();
   const description = values.description.trim();
 
+  if (!isKit) {
   if (!title) errors.title = 'Informe o título.';
   else if (title.length > MAX_LENGTH.title) errors.title = `Use no máximo ${MAX_LENGTH.title} caracteres.`;
 
-  if (!isKit) {
-    if (!author) errors.author = 'Informe o autor.';
-    else if (author.length > MAX_LENGTH.author) errors.author = `Use no máximo ${MAX_LENGTH.author} caracteres.`;
-  }
+  if (!author) errors.author = 'Informe o autor.';
+  else if (author.length > MAX_LENGTH.author) errors.author = `Use no máximo ${MAX_LENGTH.author} caracteres.`;
+}
 
   if (!description) errors.description = 'Descreva o produto.';
   else if (description.length > MAX_LENGTH.description) errors.description = `Use no máximo ${MAX_LENGTH.description} caracteres.`;
@@ -70,10 +70,6 @@ export function validateProductForm(values) {
   if (!values.price.trim()) errors.price = 'Informe o preço.';
   else if (price === null) errors.price = 'Use um valor como 29,90.';
   else if (price <= 0) errors.price = 'O preço deve ser maior que zero.';
-
-  if (isKit && !(Number.isInteger(values.bookCount) && values.bookCount >= 1 && values.bookCount <= MAX_KIT_BOOKS)) {
-    errors.bookCount = `Escolha de 1 a ${MAX_KIT_BOOKS} livros.`;
-  }
 
   return errors;
 }
